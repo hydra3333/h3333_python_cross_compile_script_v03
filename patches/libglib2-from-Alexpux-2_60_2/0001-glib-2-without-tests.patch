@@ -1,0 +1,13 @@
+--- a/meson.build	2019-05-06 01:44:42.428533000 -0700
++++ b/meson.build	2019-05-06 01:44:42.428533000 -0700
+@@ -1993,8 +1993,8 @@
+ subdir('gthread')
+ subdir('gmodule')
+ subdir('gio')
+-subdir('fuzzing')
+-subdir('tests')
++#subdir('fuzzing')
++#subdir('tests')
+ 
+ # xgettext is optional (on Windows for instance)
+ if find_program('xgettext', required : get_option('nls')).found()

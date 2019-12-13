@@ -1,0 +1,18 @@
+--- CMakeLists.txt.orig	2019-05-09 19:23:47.955798000 -0700
++++ CMakeLists.txt	2019-05-09 19:23:47.955798000 -0700
+@@ -194,6 +194,7 @@
+ 	endif()
+  
+ 	pkg_check_modules (SSL REQUIRED ${SSL_REQUIRED_MODULES})
++	set (SRT_LIBS_PRIVATE ${SSL_LDFLAGS})
+ 
+ 	add_definitions(
+ 		-DUSE_GNUTLS=1
+@@ -234,6 +235,7 @@
+ 			find_package(OpenSSL REQUIRED)
+ 			set (SSL_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR})
+ 			set (SSL_LIBRARIES ${OPENSSL_LIBRARIES})
++			set (SRT_LIBS_PRIVATE ${SSL_LIBRARIES})
+ 			message(STATUS "SSL via find_package(OpenSSL): -I ${SSL_INCLUDE_DIRS} -l;${SSL_LIBRARIES}")
+ 		endif()
+ 	add_definitions(

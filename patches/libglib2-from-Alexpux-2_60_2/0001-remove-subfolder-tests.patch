@@ -1,0 +1,8 @@
+--- a/glib/meson.build	2019-05-07 02:59:59.278441000 -0700
++++ b/glib/meson.build	2019-05-07 02:59:59.278441000 -0700
+@@ -371,4 +371,4 @@
+     install : true)
+ endif
+ 
+-subdir('tests')
++#subdir('tests')

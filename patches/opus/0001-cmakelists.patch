@@ -1,0 +1,24 @@
+From 3df389619cf39e73d8338819d27958c67d67663a Mon Sep 17 00:00:00 2001
+From: DeadSix27 <DeadSix27@users.noreply.github.com>
+Date: Tue, 12 Nov 2019 15:22:45 +0100
+Subject: [PATCH] use PROJECT_VERSION for pkg-config file
+
+OPUS_LIBRARY_VERSION does not line up with the requirements set by opusfile, which checks for project version.
+---
+ CMakeLists.txt | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c01ec57c..c34ef261 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -316,8 +316,7 @@ if(OPUS_INSTALL_PKG_CONFIG_MODULE)
+   set(exec_prefix ${CMAKE_INSTALL_PREFIX})
+   set(libdir ${CMAKE_INSTALL_FULL_LIBDIR})
+   set(includedir ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+-  set(VERSION ${OPUS_LIBRARY_VERSION})
+-  set(VERSION ${OPUS_LIBRARY_VERSION})
++  set(VERSION ${PROJECT_VERSION})
+   if(HAVE_LIBM)
+     set(LIBM "-lm")
+   endif()

@@ -1,0 +1,30 @@
+From d8f189ac0e5d0f051e5d844bc21c253ce505e18e Mon Sep 17 00:00:00 2001
+From: DeadSix27 <DeadSix27@users.noreply.github.com>
+Date: Tue, 12 Nov 2019 14:43:56 +0100
+Subject: [PATCH] use proper pkg-config install path variable
+
+---
+ src/libFLAC++/CMakeLists.txt | 2 +-
+ src/libFLAC/CMakeLists.txt   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/libFLAC++/CMakeLists.txt b/src/libFLAC++/CMakeLists.txt
+index 4f4a02b2..b94b1a3b 100644
+--- a/src/libFLAC++/CMakeLists.txt
++++ b/src/libFLAC++/CMakeLists.txt
+@@ -50,4 +50,4 @@ install(TARGETS FLAC++ EXPORT targets
+     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}/"
+     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}/")
+ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/flac++.pc"
+-    DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig")
++    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+diff --git a/src/libFLAC/CMakeLists.txt b/src/libFLAC/CMakeLists.txt
+index 63711cf0..a6987bd9 100644
+--- a/src/libFLAC/CMakeLists.txt
++++ b/src/libFLAC/CMakeLists.txt
+@@ -127,4 +127,4 @@ install(TARGETS FLAC EXPORT targets
+     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}/"
+     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}/")
+ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/flac.pc"
+-    DESTINATION "${CMAKE_INSTALL_DATADIR}/pkgconfig")
++    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")

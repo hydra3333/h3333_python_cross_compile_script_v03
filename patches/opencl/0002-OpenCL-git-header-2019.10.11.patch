@@ -1,0 +1,26 @@
+--- a/loader/windows/icd_windows_hkr.h	2019-10-10 18:22:55.979529000 -0700
++++ b/loader/windows/icd_windows_hkr.h	2019-10-10 18:32:08.278530343 -0700
+@@ -18,5 +18,23 @@
+ 
+ #include <stdbool.h>
+ #include "icd_windows.h"
++#include <guiddef.h>
+ 
+ bool khrIcdOsVendorsEnumerateHKR(void);
++
++typedef unsigned long int DEVPROPTYPE, *PDEVPROPTYPE;
++
++typedef GUID  DEVPROPGUID, *PDEVPROPGUID;
++typedef unsigned long int DEVPROPID,   *PDEVPROPID;
++
++typedef struct _DEVPROPKEY {
++    DEVPROPGUID fmtid;
++    DEVPROPID   pid;
++} DEVPROPKEY, *PDEVPROPKEY;
++
++#define CM_GETIDLIST_FILTER_PRESENT             (0x00000100)
++#define CM_GETIDLIST_FILTER_CLASS               (0x00000200)
++
++#define DEFINE_DEVPROPKEY(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8, pid) extern const DEVPROPKEY DECLSPEC_SELECTANY name = { { l, w1, w2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } }, pid }
++
++DEFINE_DEVPROPKEY(DEVPKEY_Device_ClassGuid,              0xa45c254e, 0xdf1c, 0x4efd, 0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0, 10);    // DEVPROP_TYPE_GUID

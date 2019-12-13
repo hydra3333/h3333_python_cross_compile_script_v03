@@ -1,0 +1,17 @@
+--- configure.ac.orig	2018-08-10 07:13:55.072733000 -0700
++++ configure.ac	2018-08-10 07:17:14.793318944 -0700
+@@ -1836,11 +1836,12 @@
+ dnl The fallback code doesn't really implement the same behaviors - e.g.
+ dnl so on linux we want to require libmount unless specifically disabled
+ dnl
+-enable_libmount_default=${glib_os_linux:-no}
++enable_libmount_default=no
++enable_libmount=no
+ AC_ARG_ENABLE(libmount,
+               [AS_HELP_STRING([--enable-libmount],
+                               [build with libmount support [default for Linux]])],,
+-              [enable_libmount=$enable_libmount_default])
++              [enable_libmount=no])
+ AS_IF([ test "x$enable_libmount" = "xyes"],[
+ PKG_CHECK_MODULES([LIBMOUNT], [mount >= 2.23], [have_libmount=yes], [have_libmount=no])
+ if test $have_libmount = no ; then

@@ -1,0 +1,95 @@
+diff gettext/gettext-runtime/libasprintf/texi2html gettext/gettext-runtime/libasprintf/texi2html
+--- gettext/gettext-runtime/libasprintf/texi2html
++++ gettext/gettext-runtime/libasprintf/texi2html
+@@ -727,7 +727,7 @@ while ($_ = &next_line) {
+ 	    next;
+ 	} elsif ($tag eq 'setref') {
+ 	    &protect_html; # if setref contains '&' for instance
+-	    if (/^\@$tag\s*{($NODERE)}\s*$/) {
++	    if (/^\@$tag\s*\{($NODERE)}\s*$/) {
+ 		$setref = $1;
+ 		$setref =~ s/\s+/ /g; # normalize
+ 		$setref =~ s/ $//;
+@@ -879,7 +879,7 @@ while ($_ = &next_line) {
+     s/\@refill\s+//g;
+     # other substitutions
+     &simple_substitutions;
+-    s/\@value{($VARRE)}/$value{$1}/eg;
++    s/\@value\{($VARRE)}/$value{$1}/eg;
+     s/\@footnote\{/\@footnote$docu_doc\{/g; # mark footnotes, cf. pass 4
+     #
+     # analyze the tag again
+@@ -1204,7 +1204,7 @@ while (@lines) {
+     #
+     # xref
+     #
+-    while (/\@(x|px|info|)ref{($XREFRE)(}?)/o) {
++    while (/\@(x|px|info|)ref\{($XREFRE)(}?)/o) {
+ 	# note: Texinfo may accept other characters
+ 	($type, $nodes, $full) = ($1, $2, $3);
+ 	($before, $after) = ($`, $');
+@@ -1798,7 +1798,7 @@ sub apply_style {
+ # remove Texinfo styles
+ sub remove_style {
+     local($_) = @_;
+-    s/\@\w+{([^\{\}]+)}/$1/g;
++    s/\@\w+\{([^\{\}]+)}/$1/g;
+     return($_);
+ }
+ 
+@@ -1810,7 +1810,7 @@ sub substitute_style {
+     while ($changed) {
+ 	$changed = 0;
+ 	$done = '';
+-	while (/\@(\w+|"|\~|,|\^){([^\{\}]+)}/) {
++	while (/\@(\w+|"|\~|,|\^)\{([^\{\}]+)}/) {
+ 	    $text = &apply_style($1, $2);
+ 	    if ($text) {
+ 		$_ = "$`$text$'";
+--- gettext/gettext-tools/doc/texi2html
++++ gettext/gettext-tools/doc/texi2html
+@@ -727,7 +727,7 @@ while ($_ = &next_line) {
+ 	    next;
+ 	} elsif ($tag eq 'setref') {
+ 	    &protect_html; # if setref contains '&' for instance
+-	    if (/^\@$tag\s*{($NODERE)}\s*$/) {
++	    if (/^\@$tag\s*\{($NODERE)}\s*$/) {
+ 		$setref = $1;
+ 		$setref =~ s/\s+/ /g; # normalize
+ 		$setref =~ s/ $//;
+@@ -879,7 +879,7 @@ while ($_ = &next_line) {
+     s/\@refill\s+//g;
+     # other substitutions
+     &simple_substitutions;
+-    s/\@value{($VARRE)}/$value{$1}/eg;
++    s/\@value\{($VARRE)}/$value{$1}/eg;
+     s/\@footnote\{/\@footnote$docu_doc\{/g; # mark footnotes, cf. pass 4
+     #
+     # analyze the tag again
+@@ -1204,7 +1204,7 @@ while (@lines) {
+     #
+     # xref
+     #
+-    while (/\@(x|px|info|)ref{($XREFRE)(}?)/o) {
++    while (/\@(x|px|info|)ref\{($XREFRE)(}?)/o) {
+ 	# note: Texinfo may accept other characters
+ 	($type, $nodes, $full) = ($1, $2, $3);
+ 	($before, $after) = ($`, $');
+@@ -1798,7 +1798,7 @@ sub apply_style {
+ # remove Texinfo styles
+ sub remove_style {
+     local($_) = @_;
+-    s/\@\w+{([^\{\}]+)}/$1/g;
++    s/\@\w+\{([^\{\}]+)}/$1/g;
+     return($_);
+ }
+ 
+@@ -1810,7 +1810,7 @@ sub substitute_style {
+     while ($changed) {
+ 	$changed = 0;
+ 	$done = '';
+-	while (/\@(\w+|"|\~|,|\^){([^\{\}]+)}/) {
++	while (/\@(\w+|"|\~|,|\^)\{([^\{\}]+)}/) {
+ 	    $text = &apply_style($1, $2);
+ 	    if ($text) {
+ 		$_ = "$`$text$'";

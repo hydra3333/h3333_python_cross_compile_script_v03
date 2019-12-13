@@ -1,0 +1,143 @@
+From 6bcf84eb3e4f1b975452789677427be8450be7a9 Mon Sep 17 00:00:00 2001
+From: DeadSix27 <DeadSix27@users.noreply.github.com>
+Date: Sat, 10 Mar 2018 09:50:13 +0100
+Subject: [PATCH 1/1] cross-compile-static-linking-hacks
+
+---
+ loader/CMakeLists.txt       | 14 +++++---------
+ loader/loader.c             |  4 ++--
+ loader/loader.h             |  3 +++
+ loader/loader.rc            |  4 ++++
+ loader/vk_loader_platform.h |  2 +-
+ loader/vulkan.pc.in         |  4 ++--
+ 6 files changed, 17 insertions(+), 14 deletions(-)
+
+diff --git a/loader/CMakeLists.txt b/loader/CMakeLists.txt
+index f543f861..1f48ce08 100644
+--- a/loader/CMakeLists.txt
++++ b/loader/CMakeLists.txt
+@@ -23,7 +23,7 @@ endif()
+ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+     add_definitions(-DVK_USE_PLATFORM_WIN32_KHR -DWIN32_LEAN_AND_MEAN)
+     set(DisplayServer Win32)
+-    if (NOT MSVC_VERSION LESS 1900)
++    if (MSVC AND NOT MSVC_VERSION LESS 1900)
+         # Enable control flow guard
+         message(STATUS "Building loader with control flow guard")
+         add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/guard:cf>")
+@@ -94,7 +94,7 @@ set(ASM_FAILURE_MSG "The build will fall back on building with C code\n")
+ set(ASM_FAILURE_MSG "${ASM_FAILURE_MSG}Note that this may be unsafe, as the C code requires tail-call optimizations to remove")
+ set(ASM_FAILURE_MSG "${ASM_FAILURE_MSG} the stack frame for certain calls. If the compiler does not do this, then unknown device")
+ set(ASM_FAILURE_MSG "${ASM_FAILURE_MSG} extensions will suffer from a corrupted stack.")
+-if (WIN32)
++if (MSVC AND WIN32)
+     enable_language(ASM_MASM)
+     if (CMAKE_ASM_MASM_COMPILER_WORKS)
+         if (NOT CMAKE_CL_64)
+@@ -147,7 +147,7 @@ add_custom_target(loader_gen_files DEPENDS
+     )
+ set_target_properties(loader_gen_files PROPERTIES FOLDER ${LVL_TARGET_FOLDER})
+ 
+-if (WIN32)
++if (MSVC AND WIN32)
+     # Use static MSVCRT libraries
+     foreach(configuration in CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_RELWITHDEBINFO
+                              CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+@@ -227,10 +227,8 @@ else()
+         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-typedef-redefinition")
+     endif()
+ 
+-    add_library(${API_LOWERCASE} SHARED ${NORMAL_LOADER_SRCS} ${OPT_LOADER_SRCS} ${FRAMEWORK_HEADERS})
++    add_library(${API_LOWERCASE} STATIC ${NORMAL_LOADER_SRCS} ${OPT_LOADER_SRCS} ${FRAMEWORK_HEADERS})
+     add_dependencies(${API_LOWERCASE} generate_helper_files loader_gen_files loader_asm_gen_files)
+-    target_compile_definitions(${API_LOWERCASE} PUBLIC -DLOADER_DYNAMIC_LIB)
+-    set_target_properties(${API_LOWERCASE} PROPERTIES SOVERSION "1" VERSION "1.1.${vk_header_version}")
+     target_link_libraries(${API_LOWERCASE} -ldl -lpthread -lm)
+ 
+     if(APPLE)
+@@ -281,9 +279,7 @@ else()
+         include(FindPkgConfig QUIET)
+         if(PKG_CONFIG_FOUND)
+             set(VK_API_VERSION "1.1.${vk_header_version}")
+-            foreach(LIB ${CMAKE_CXX_IMPLICIT_LINK_LIBRARIES} ${PLATFORM_LIBS})
+-                set(PRIVATE_LIBS "${PRIVATE_LIBS} -l${LIB}")
+-            endforeach()
++            set(PRIVATE_LIBS "${PRIVATE_LIBS} -lshlwapi -lcfgmgr32")
+             configure_file("vulkan.pc.in" "vulkan.pc" @ONLY)
+             if(INSTALL_LVL_FILES)
+                 install(FILES       "${CMAKE_CURRENT_BINARY_DIR}/vulkan.pc"
+diff --git a/loader/loader.c b/loader/loader.c
+index 1e7a8049..b4744d88 100644
+--- a/loader/loader.c
++++ b/loader/loader.c
+@@ -52,9 +52,9 @@
+ #include "murmurhash.h"
+ 
+ #if defined(_WIN32)
+-#include <Cfgmgr32.h>
++#include <cfgmgr32.h>
+ #include <initguid.h>
+-#include <Devpkey.h>
++#include <devpkey.h>
+ #endif
+ 
+ // This is a CMake generated file with #defines for any functions/includes
+diff --git a/loader/loader.h b/loader/loader.h
+index 8abc034a..5d06ade5 100644
+--- a/loader/loader.h
++++ b/loader/loader.h
+@@ -44,6 +44,9 @@
+ #define LOADER_EXPORT
+ #endif
+ 
++#define CM_GETIDLIST_FILTER_CLASS ( 0x00000200 )
++#define CM_GETIDLIST_FILTER_PRESENT ( 0x00000100 )
++
+ // A debug option to disable allocators at compile time to investigate future issues.
+ #define DEBUG_DISABLE_APP_ALLOCATORS 0
+ 
+diff --git a/loader/loader.rc b/loader/loader.rc
+index 177de20b..1c865bf5 100755
+--- a/loader/loader.rc
++++ b/loader/loader.rc
+@@ -43,7 +43,11 @@
+ ///////////////////////////////////////////////////////////////////////////////
+ ///////////////////////////////////////////////////////////////////////////////
+ 
++#ifdef __MINGW64__
++#include <winresrc.h>
++#else // MSVC
+ #include "winres.h"
++#endif
+ 
+ #define VER_FILE_VERSION            VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_BUILDNO
+ 
+diff --git a/loader/vk_loader_platform.h b/loader/vk_loader_platform.h
+index 41625602..2a45b646 100644
+--- a/loader/vk_loader_platform.h
++++ b/loader/vk_loader_platform.h
+@@ -25,7 +25,7 @@
+ 
+ #if defined(_WIN32)
+ // WinSock2.h must be included *BEFORE* windows.h
+-#include <WinSock2.h>
++#include <winsock2.h>
+ #endif  // _WIN32
+ 
+ #include "vulkan/vk_platform.h"
+diff --git a/loader/vulkan.pc.in b/loader/vulkan.pc.in
+index 2ce5aea4..6e897033 100644
+--- a/loader/vulkan.pc.in
++++ b/loader/vulkan.pc.in
+@@ -1,6 +1,6 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+-exec_prefix=@CMAKE_INSTALL_PREFIX@
+-libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
++exec_prefix=${prefix}
++libdir=${exec_prefix}/lib
+ includedir=${prefix}/include
+ 
+ Name: @CMAKE_PROJECT_NAME@
+-- 
+2.16.2
+

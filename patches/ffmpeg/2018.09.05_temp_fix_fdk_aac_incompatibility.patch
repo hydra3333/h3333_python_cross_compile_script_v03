@@ -1,0 +1,14 @@
+--- a/libavcodec/libfdk-aacenc.c	2018-09-05 22:28:50.071703112 +0930
++++ b/libavcodec/libfdk-aacenc.c	2018-09-05 22:30:05.183907088 +0930
+@@ -290,7 +290,11 @@
+     }
+ 
+     avctx->frame_size = info.frameLength;
++#if AACENCODER_LIB_VL0 < 4
+     avctx->initial_padding = info.encoderDelay;
++#else
++    avctx->initial_padding = info.nDelay;
++#endif
+     ff_af_queue_init(avctx, &s->afq);
+ 
+     if (avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER) {

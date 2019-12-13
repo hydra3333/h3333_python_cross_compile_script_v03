@@ -1,0 +1,12 @@
+--- a/CMakeLists.txt	2019-05-09 04:56:20.392193373 -0700
++++ b/CMakeLists.txt	2019-05-09 05:07:08.271939705 -0700
+@@ -58,7 +58,8 @@
+ set (OPENCL_ICD_LOADER_HEADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/inc CACHE PATH "Path to OpenCL Headers")
+ 
+ add_library (OpenCL ${OPENCL_ICD_LOADER_SOURCES})
+-set_target_properties (OpenCL PROPERTIES VERSION "1.2" SOVERSION "1")
++#set_target_properties (OpenCL PROPERTIES VERSION "1.2" SOVERSION "1")
++set_target_properties (OpenCL PROPERTIES PREFIX "")
+ 
+ if (WIN32)
+     target_link_libraries (OpenCL cfgmgr32.lib)
